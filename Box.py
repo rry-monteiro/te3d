@@ -58,5 +58,3 @@ class Box(ursina.Entity):
                 rotation=props['rotation'],
                 position=props['position'],
             )
-        
-        return

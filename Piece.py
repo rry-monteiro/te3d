@@ -1,9 +1,8 @@
 import ursina
 from typing import Literal
 
-
 class Piece(ursina.Entity):
-    def __init__(self, tipo: Literal["I", "O", "T", "S", "Z", "L", "J"]):
+    def __init__(self, tipo: Literal["I", "O", "T", "S", "Z", "L", "J"], xyz:int):
         super().__init__()
         self.map_tetraminos = {
             # <<<
@@ -46,9 +45,16 @@ class Piece(ursina.Entity):
         self.mut_offsets = list(self.map_tetraminos[tipo]["offsets"])
         # referencias dos cubos
         self.cubos = []
+        # limite do fundo
+        self.limites = {
+            'zmax' : xyz*2,
+            'xymin' : -(xyz/2-1),
+            'xymax' : xyz/2
+        }
 
     # constroi a peça
     def build(self):
+        # <<<
         for offset in self.map_tetraminos[self.tipo]["offsets"]:
             cubo = ursina.Entity(
                 model="cube",
@@ -60,48 +66,74 @@ class Piece(ursina.Entity):
                 parent=self,
             )
             self.cubos.append(cubo)
+        # >>>
 
-    """
-    rotação matemática das peças, move os cubos para posições diferentes, dando a impressão de rotação
-    Regras (rotação 90° horário, regra da mão direita):
-        X: (x, y, z) -> (x, -z,  y)
-        Y: (x, y, z) -> ( z,  y, -x)
-        Z: (x, y, z) -> (-y,  x,  z)
-    """
+    # rotaciona a peça
     def rotate(self, axis):
-        novos_offsets = []
+        # <<<
+        """
+        rotação matemática das peças, move os cubos para posições diferentes, dando a impressão de rotação
+        Regras (rotação 90° horário, regra da mão direita):
+            X: (x, y, z) -> (x, -z,  y)
+            Y: (x, y, z) -> ( z,  y, -x)
+            Z: (x, y, z) -> (-y,  x,  z)
+        """
+        novos = []
+        # salva quais serão os offsets novos depois das mudanças
         for x, y, z in self.mut_offsets:
-            if axis == "x":
-                # Gira no plano YZ: Y vira Z (invertido), Z vira Y
-                nx, ny, nz = x, -z, y
-            elif axis == "y":
-                # Gira no plano XZ: X vira Z, Z vira X (invertido)
-                nx, ny, nz = z, y, -x
-            elif axis == "z":
-                # Gira no plano XY: X vira Y (invertido), Y vira X
-                nx, ny, nz = -y, x, z
+            if axis == "x":   novos.append((x, -z, y))
+            elif axis == "y": novos.append((z, y, -x))
+            elif axis == "z": novos.append((-y, x, z))
 
-            novos_offsets.append((nx, ny, nz))
+        # verifica se os offsets novos saem da box
+        for ox, oy, oz in novos:
+            # coma os offsets novos com os atuais
+            cx = self.position.x + ox
+            cy = self.position.y + oy
+            cz = self.position.z + oz
+            # verifica se algum deles passa da box
+            if cx < self.limites["xymin"] or cx > self.limites["xymax"]: return
+            if cy < self.limites["xymin"] or cy > self.limites["xymax"]: return
+            if cz > self.limites["zmax"]: return
 
-        # TODO: aqui futuramente vai a verificação de colisão
-        # if not self._is_valid(novos_offsets):
-        #     return  # não gira se colidir com algo
+        # salva a nova posição
+        self.mut_offsets = novos
+        # muda os cubos de lugar de acordo com os novos
+        for i in range(len(self.cubos)):
+            self.cubos[i].position = self.mut_offsets[i]
+        # >>>
 
-        self.mut_offsets = novos_offsets
-        for cubo, offset in zip(self.cubos, self.mut_offsets):
-            cubo.position = offset
+    # tenta mover uma peça
+    def move(self, dx:float, dy:float, dz:float)->None:
+        # <<<
+        #cria as posições virtuais
+        for ox, oy, oz in self.mut_offsets:
+            cx = self.position.x + ox + dx
+            cy = self.position.y + oy + dy
+            cz = self.position.z + oz + dz
+
+            # verifica se elas saem da box
+            if cx < self.limites["xymin"] or cx > self.limites["xymax"]: return
+            if cy < self.limites["xymin"] or cy > self.limites["xymax"]: return
+            if cz > self.limites["zmax"]: return
+
+        # altera a posição
+        self.position += (dx, dy, dz)
+        # >>>
 
     # recebe chaves do teclado e realiza ações
     def input(self, key):
         match key:
+            case "space":
+                pass  # hard drop depois
             case "w":
-                self.position += (0, 1, 0)  # +y
+                self.move(0, 1, 0)
             case "s":
-                self.position += (0, -1, 0)  # -y
+                self.move(0, -1, 0)
             case "d":
-                self.position += (1, 0, 0)  # +x
+                self.move(1, 0, 0)
             case "a":
-                self.position += (-1, 0, 0)  # -x
+                self.move(-1, 0, 0)
             case "h":
                 self.rotate("y")
             case "j":

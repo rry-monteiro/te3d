@@ -3,13 +3,9 @@ from Box import Box
 from ursina import Ursina
 from ursina import EditorCamera
 
+XYZ = 17
 
-def input(key):
-    match key:
-        case "space":
-             print("space")
 def main():
-    
     # gerando o app
     app = Ursina("te3d")
 
@@ -20,15 +16,18 @@ def main():
     )
         
     # gerando a caixa de limites
-    box = Box(16)
-    box.build()
-
-    piece = Piece("Z")
-    piece.build()
-
-    # rodando app
     app.run()
-    return
+
+def input(key):
+    match key:
+        case 'space':
+            play()
+
+def play():
+    box = Box(XYZ)
+    box.build()
+    piece = Piece("Z", box.xyz)
+    piece.build()
 
 
 if __name__ == "__main__":
