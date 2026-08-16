@@ -2,7 +2,12 @@ import ursina
 from typing import Literal
 
 class Piece(ursina.Entity):
-    def __init__(self, tipo: Literal["I", "O", "T", "S", "Z", "L", "J"], xyz:int):
+    def __init__(
+            self,
+            tipo: Literal["I", "O", "T", "S", "Z", "L", "J"],
+            xyz:int,
+            on_lock=None
+    ):
         super().__init__()
         self.map_tetraminos = {
             # <<<
@@ -51,9 +56,10 @@ class Piece(ursina.Entity):
             'xymin' : -(xyz/2-1),
             'xymax' : xyz/2
         }
+        self._build()
 
     # constroi a peça
-    def build(self):
+    def _build(self):
         # <<<
         for offset in self.map_tetraminos[self.tipo]["offsets"]:
             cubo = ursina.Entity(
@@ -113,9 +119,9 @@ class Piece(ursina.Entity):
             cz = self.position.z + oz + dz
 
             # verifica se elas saem da box
-            if cx < self.limites["xymin"] or cx > self.limites["xymax"]: return
-            if cy < self.limites["xymin"] or cy > self.limites["xymax"]: return
-            if cz > self.limites["zmax"]: return
+            if cx < self.limites["xymin"] or cx > self.limites["xymax"]: return False
+            if cy < self.limites["xymin"] or cy > self.limites["xymax"]: return False
+            if cz > self.limites["zmax"]: return False
 
         # altera a posição
         self.position += (dx, dy, dz)
