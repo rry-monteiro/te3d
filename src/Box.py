@@ -4,6 +4,7 @@ class Box(ursina.Entity):
     def __init__(self, xyz: int):
         super().__init__()
         self.xyz = xyz
+        self._build()
 
     def _get_dimensions(self):
         # se for impar, ajusta somando 1
@@ -12,7 +13,7 @@ class Box(ursina.Entity):
         # retorna lado da face quadrada e profundidade
         return self.xyz, self.xyz*2
 
-    def build(self):
+    def _build(self):
         # ajustando as dimensões
         s, d = self._get_dimensions()
 
