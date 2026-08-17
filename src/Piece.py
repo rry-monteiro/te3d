@@ -6,9 +6,20 @@ class Piece(ursina.Entity):
             self,
             tipo: Literal["I", "O", "T", "S", "Z", "L", "J"],
             xyz:int,
-            on_lock=None
+            ocupados:set,
+            on_lock=None,
     ):
+        # <<<
         super().__init__()
+        # limits da box
+        self.limites = {
+            # <<<
+            'zmax' : xyz*2,
+            'xymin' : -(xyz/2-1),
+            'xymax' : xyz/2
+        }
+            # >>>
+        # mapa de tetraminos
         self.map_tetraminos = {
             # <<<
             "I": {
@@ -39,9 +50,8 @@ class Piece(ursina.Entity):
                 "offsets": [(0, 0, 0), (-1, 0, 0), (0, 1, 0), (0, 2, 0)],
                 "color": ursina.color.blue,
             },
-            # >>>
         }
-
+            # >>>
         # tipo de peça definida por letra
         self.tipo = tipo
         # shader padrão
@@ -50,13 +60,17 @@ class Piece(ursina.Entity):
         self.mut_offsets = list(self.map_tetraminos[tipo]["offsets"])
         # referencias dos cubos
         self.cubos = []
-        # limite do fundo
-        self.limites = {
-            'zmax' : xyz*2,
-            'xymin' : -(xyz/2-1),
-            'xymax' : xyz/2
-        }
+        # set de lugares ja ocupados
+        self.ocupados=ocupados
+        # flag de peça travada
+        self.esta_travada = False
+        # função que é chamada quando a peça é ravada
+        self.on_lock = on_lock
+        # construção
         self._build()
+        # inicia a queda
+        self._init_queda()
+        # >>>
 
     # constroi a peça
     def _build(self):
@@ -97,10 +111,14 @@ class Piece(ursina.Entity):
             cx = self.position.x + ox
             cy = self.position.y + oy
             cz = self.position.z + oz
+
             # verifica se algum deles passa da box
             if cx < self.limites["xymin"] or cx > self.limites["xymax"]: return
             if cy < self.limites["xymin"] or cy > self.limites["xymax"]: return
             if cz > self.limites["zmax"]: return
+
+            # verificação de colisão com outras peças
+            if (cx, cy, cz) in self.ocupados: return
 
         # salva a nova posição
         self.mut_offsets = novos
@@ -123,26 +141,49 @@ class Piece(ursina.Entity):
             if cy < self.limites["xymin"] or cy > self.limites["xymax"]: return False
             if cz > self.limites["zmax"]: return False
 
+            # verificação de colisão com outras peças
+            if (cx, cy, cz) in self.ocupados: return False
+
         # altera a posição
         self.position += (dx, dy, dz)
+        return True
+        # >>>
+
+    # começa a queda
+    def _init_queda(self):
+        # <<<
+        ursina.invoke(self._queda_unitaria, delay=.5)
+        # >>>
+
+    # faz a peça cair de 1 em 1
+    def _queda_unitaria(self):
+        # <<<
+        # se ja está travada, retorna
+        if self.esta_travada: return
+
+        # tenta mover
+        move_ok = self.move(0,0,1)
+
+        # se não moveu
+        if not move_ok:
+            # ta travada
+            self.esta_travada = True
+            # chama a função pra qunaod ela travar
+            self.on_lock()
+            return
+        # invoca novamente
+        ursina.invoke(self._queda_unitaria, delay=.5)
         # >>>
 
     # recebe chaves do teclado e realiza ações
     def input(self, key):
+        if self.esta_travada: return
         match key:
-            case "space":
-                pass  # hard drop depois
-            case "w":
-                self.move(0, 1, 0)
-            case "s":
-                self.move(0, -1, 0)
-            case "d":
-                self.move(1, 0, 0)
-            case "a":
-                self.move(-1, 0, 0)
-            case "h":
-                self.rotate("y")
-            case "j":
-                self.rotate("x")
-            case "k":
-                self.rotate("z")
+            case "space": pass  # hard drop depois
+            case "w": self.move(0, 1, 0)
+            case "s": self.move(0, -1, 0)
+            case "d": self.move(1, 0, 0)
+            case "a": self.move(-1, 0, 0)
+            case "h": self.rotate("y")
+            case "j": self.rotate("x")
+            case "k": self.rotate("z")
