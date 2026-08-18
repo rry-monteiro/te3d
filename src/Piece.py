@@ -23,31 +23,31 @@ class Piece(ursina.Entity):
         self.map_tetraminos = {
             # <<<
             "I": {
-                "offsets": [(0, 0, 0), (0, 1, 0), (0, 2, 0), (0, 3, 0)],
+                "offsets": [(0, 0, 0), (0, 0, 1), (0, 0, 2), (0, 0, 3)],
                 "color": ursina.color.cyan,
             },
             "O": {
-                "offsets": [(0, 0, 0), (0, 1, 0), (1, 1, 0), (1, 0, 0)],
+                "offsets": [(0, 0, 0), (0, 0, 1), (1, 0, 1), (1, 0, 0)],
                 "color": ursina.color.yellow,
             },
             "T": {
-                "offsets": [(0, 0, 0), (0, 1, 0), (-1, 1, 0), (1, 1, 0)],
+                "offsets": [(0, 0, 0), (0, 0, 1), (-1, 0, 1), (1, 0, 1)],
                 "color": ursina.color.violet,
             },
             "S": {
-                "offsets": [(0, 0, 0), (0, 1, 0), (-1, 0, 0), (1, 1, 0)],
+                "offsets": [(0, 0, 0), (0, 0, 1), (-1, 0, 0), (1, 0, 1)],
                 "color": ursina.color.green,
             },
             "Z": {
-                "offsets": [(0, 0, 0), (0, 1, 0), (-1, 1, 0), (1, 0, 0)],
+                "offsets": [(0, 0, 0), (0, 0, 1), (-1, 0, 1), (1, 0, 0)],
                 "color": ursina.color.red,
             },
             "L": {
-                "offsets": [(0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 2, 0)],
+                "offsets": [(0, 0, 0), (1, 0, 0), (0, 0, 1), (0, 0, 2)],
                 "color": ursina.color.orange,
             },
             "J": {
-                "offsets": [(0, 0, 0), (-1, 0, 0), (0, 1, 0), (0, 2, 0)],
+                "offsets": [(0, 0, 0), (-1, 0, 0), (0, 0, 1), (0, 0, 2)],
                 "color": ursina.color.blue,
             },
         }
