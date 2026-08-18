@@ -180,8 +180,8 @@ class Piece(ursina.Entity):
         if self.esta_travada: return
         match key:
             case "space": pass  # hard drop depois
-            case "w": self.move(0, 1, 0)
-            case "s": self.move(0, -1, 0)
+            case "w": self.move(0, 0, 1)
+            case "s": self.move(0, 0, -1)
             case "d": self.move(1, 0, 0)
             case "a": self.move(-1, 0, 0)
             case "h": self.rotate("y")
