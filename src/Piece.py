@@ -14,9 +14,9 @@ class Piece(ursina.Entity):
         # limits da box
         self.limites = {
             # <<<
-            'zmax' : xyz*2,
-            'xymin' : -(xyz/2-1),
-            'xymax' : xyz/2
+            'ymin' : -xyz*2+1,    # valor mínimo que a peça pode cair
+            'xzmin' : -(xyz/2-1), # valor mínimo que a peça pode andar para z e x
+            'xzmax' : xyz/2       # valor máximo que a peça pode andar para z e x
         }
             # >>>
         # mapa de tetraminos
@@ -113,9 +113,9 @@ class Piece(ursina.Entity):
             cz = self.position.z + oz
 
             # verifica se algum deles passa da box
-            if cx < self.limites["xymin"] or cx > self.limites["xymax"]: return
-            if cy < self.limites["xymin"] or cy > self.limites["xymax"]: return
-            if cz > self.limites["zmax"]: return
+            if cx < self.limites["xzmin"] or cx > self.limites["xzmax"]: return
+            if cz < self.limites["xzmin"] or cz > self.limites["xzmax"]: return
+            if cy > self.limites["ymin"]: return
 
             # verificação de colisão com outras peças
             if (cx, cy, cz) in self.ocupados: return
@@ -137,9 +137,9 @@ class Piece(ursina.Entity):
             cz = self.position.z + oz + dz
 
             # verifica se elas saem da box
-            if cx < self.limites["xymin"] or cx > self.limites["xymax"]: return False
-            if cy < self.limites["xymin"] or cy > self.limites["xymax"]: return False
-            if cz > self.limites["zmax"]: return False
+            if cx < self.limites["xzmin"] or cx > self.limites["xzmax"]: return False
+            if cz < self.limites["xzmin"] or cz > self.limites["xzmax"]: return False
+            if cy < self.limites["ymin"]: return False
 
             # verificação de colisão com outras peças
             if (cx, cy, cz) in self.ocupados: return False
@@ -162,7 +162,7 @@ class Piece(ursina.Entity):
         if self.esta_travada: return
 
         # tenta mover
-        move_ok = self.move(0,0,1)
+        move_ok = self.move(0,-1,0)
 
         # se não moveu
         if not move_ok:
