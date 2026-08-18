@@ -128,7 +128,7 @@ class Piece(ursina.Entity):
         # >>>
 
     # tenta mover uma peça
-    def move(self, dx:float, dy:float, dz:float)->None:
+    def _move(self, dx:float, dy:float, dz:float)->None:
         # <<<
         #cria as posições virtuais
         for ox, oy, oz in self.mut_offsets:
@@ -162,7 +162,7 @@ class Piece(ursina.Entity):
         if self.esta_travada: return
 
         # tenta mover
-        move_ok = self.move(0,-1,0)
+        move_ok = self._move(0,-1,0)
 
         # se não moveu
         if not move_ok:
@@ -180,10 +180,10 @@ class Piece(ursina.Entity):
         if self.esta_travada: return
         match key:
             case "space": pass  # hard drop depois
-            case "w": self.move(0, 0, 1)
-            case "s": self.move(0, 0, -1)
-            case "d": self.move(1, 0, 0)
-            case "a": self.move(-1, 0, 0)
+            case "w": self._move(0, 0, 1)
+            case "s": self._move(0, 0, -1)
+            case "d": self._move(1, 0, 0)
+            case "a": self._move(-1, 0, 0)
             case "h": self.rotate("y")
             case "j": self.rotate("x")
             case "k": self.rotate("z")
