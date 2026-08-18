@@ -21,28 +21,43 @@ class Box(ursina.Entity):
             # <<<
             'fundo': {
                 'scale': (s, s),
-                'rotation': (0, 0, 0),
-                'position': (0.5, 0.5, d + 0.5),
-            },
-            'parede_d': {
-                'scale': (d, s),
-                'rotation': (0, 90, 0),
-                'position': (s/2 + 0.5, 0.5, s + 0.5),
-            },
-            'parede_e': {
-                'scale': (d, s),
-                'rotation': (0, -90, 0),
-                'position': (-s/2 + 0.5, 0.5, s + 0.5),
-            },
-            'chao': {
-                'scale': (s, d),
+                # 'rotation': (0, 0, 90),
+                # 'position': (0.5, 0.5, d+0.5),
                 'rotation': (90, 0, 0),
-                'position': (0.5, -s/2 + 0.5, s + 0.5),
+                'position': (0.5, -d+0.5, 0.5),
             },
-            'teto': {
+            # direita
+            'parede_1_dir': {
+                'scale': (d, s),
+                # 'rotation': (0, 90, 0),
+                # 'position': (s/2 + 0.5, 0.5, s+0.5),
+                'rotation': (0, 90, 90),
+                'position': (s/2 + 0.5, -s+0.5, 0.5),
+            },
+            # esquerda
+            'parede_2_esq': {
+                'scale': (d, s),
+                # 'rotation': (0, -90, 0),
+                # 'position': (-s/2 + 0.5, 0.5, s + 0.5),
+                'rotation': (0, -90, 90),
+                'position': (-s/2 + 0.5, -s+0.5, 0.5),
+            },
+            # tras
+            'parede_1_tras': {
                 'scale': (s, d),
-                'rotation': (-90, 0, 0),
-                'position': (0.5, s/2 + 0.5, s + 0.5),
+                # 'rotation': (90, 0, 0),
+                # 'position': (0.5, -s/2 + 0.5, s + 0.5),
+                'rotation': (0, 0, 0),
+                'position': (0.5, -s + 0.5, s/2+0.5),
+            },
+            # frente
+            'parede_2_fre': {
+                'scale': (s, d),
+                # 'rotation': (-90, 0, 0),
+                # 'position': (0.5, s/2 + 0.5, s + 0.5),
+                'rotation': (0, -180, 0),
+                'position': (0.5, -s+0.5, -s/2+0.5),
+
             },
             # >>>
         }
