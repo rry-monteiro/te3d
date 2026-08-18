@@ -115,7 +115,7 @@ class Piece(ursina.Entity):
             # verifica se algum deles passa da box
             if cx < self.limites["xzmin"] or cx > self.limites["xzmax"]: return
             if cz < self.limites["xzmin"] or cz > self.limites["xzmax"]: return
-            if cy > self.limites["ymin"]: return
+            if cy < self.limites["ymin"]: return
 
             # verificação de colisão com outras peças
             if (cx, cy, cz) in self.ocupados: return
