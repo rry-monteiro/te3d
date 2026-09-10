@@ -89,11 +89,11 @@ class Piece(ursina.Entity):
         # >>>
 
     # rotaciona a peça
-    def rotate(self, axis):
+    def _rotate(self, axis):
         # <<<
         """
         rotação matemática das peças, move os cubos para posições diferentes, dando a impressão de rotação
-        Regras (rotação 90° horário, regra da mão direita):
+        regras (rotação 90° horário, regra da mão direita):
             X: (x, y, z) -> (x, -z,  y)
             Y: (x, y, z) -> ( z,  y, -x)
             Z: (x, y, z) -> (-y,  x,  z)
@@ -184,6 +184,6 @@ class Piece(ursina.Entity):
             case "s": self._move(0, 0, -1)
             case "d": self._move(1, 0, 0)
             case "a": self._move(-1, 0, 0)
-            case "h": self.rotate("y")
-            case "j": self.rotate("x")
-            case "k": self.rotate("z")
+            case "h": self._rotate("y")
+            case "j": self._rotate("x")
+            case "k": self._rotate("z")
