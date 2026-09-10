@@ -7,9 +7,6 @@ class Box(ursina.Entity):
         self._build()
 
     def _get_dimensions(self):
-        # se for impar, ajusta somando 1
-        if self.xyz % 2 == 1:
-            self.xyz += 1
         # retorna lado da face quadrada e profundidade
         return self.xyz, self.xyz*2
 
