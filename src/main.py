@@ -4,7 +4,7 @@ from ursina import Ursina
 from ursina import EditorCamera
 import random
 
-XYZ: int = 10
+XYZ: int = 12
 TIPOS: list = ["I", "O", "T", "S", "Z", "L", "J"]
 piece = None
 ocupados: set = set()
