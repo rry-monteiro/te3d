@@ -127,6 +127,19 @@ class Piece(ursina.Entity):
             self.cubos[i].position = self.mut_offsets[i]
         # >>>
 
+    # retorna uma lista de tuplas com as posições das peças da peça (ta confuso, mas retorna a posição da peça)
+    def _get_positions(self, dx:float=0, dy:float=0, dz:float=0)->list(tuple):
+        return [
+            # <<<
+            (
+                self.position.x + ox + dx,
+                self.position.y + oy + dy,
+                self.position.z + oz + dz,
+            )
+            for ox, oy, oz in self.mut_offsets
+            # >>>
+        ]
+
     # tenta mover uma peça
     def _move(self, dx:float, dy:float, dz:float)->None:
         # <<<
@@ -174,6 +187,10 @@ class Piece(ursina.Entity):
         # invoca novamente
         ursina.invoke(self._queda_unitaria, delay=.5)
         # >>>
+
+    # dropa a peça até o fim
+    def _drop(self):
+        pass
 
     # recebe chaves do teclado e realiza ações
     def input(self, key):
