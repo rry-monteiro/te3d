@@ -106,12 +106,7 @@ class Piece(ursina.Entity):
             elif axis == "z": novos.append((-y, x, z))
 
         # verifica se os offsets novos saem da box
-        for ox, oy, oz in novos:
-            # coma os offsets novos com os atuais
-            cx = self.position.x + ox
-            cy = self.position.y + oy
-            cz = self.position.z + oz
-
+        for cx, cy, cz in self._get_positions(offsets=novos):
             # verifica se algum deles passa da box
             if cx < self.limites["xzmin"] or cx > self.limites["xzmax"]: return
             if cz < self.limites["xzmin"] or cz > self.limites["xzmax"]: return
@@ -128,7 +123,7 @@ class Piece(ursina.Entity):
         # >>>
 
     # retorna uma lista de tuplas com as posições das peças da peça (ta confuso, mas retorna a posição da peça)
-    def _get_positions(self, dx:float=0, dy:float=0, dz:float=0)->list(tuple):
+    def _get_positions(self, offsets=None, dx:float=0, dy:float=0, dz:float=0)->list(tuple):
         return [
             # <<<
             (
@@ -136,7 +131,8 @@ class Piece(ursina.Entity):
                 self.position.y + oy + dy,
                 self.position.z + oz + dz,
             )
-            for ox, oy, oz in self.mut_offsets
+            for ox, oy, oz in (offsets if offsets else self.mut_offsets)
+
             # >>>
         ]
 
@@ -144,10 +140,7 @@ class Piece(ursina.Entity):
     def _move(self, dx:float, dy:float, dz:float)->None:
         # <<<
         #cria as posições virtuais
-        for ox, oy, oz in self.mut_offsets:
-            cx = self.position.x + ox + dx
-            cy = self.position.y + oy + dy
-            cz = self.position.z + oz + dz
+        for cx, cy, cz in self._get_positions(dx=dx, dy=dy, dz=dz):
 
             # verifica se elas saem da box
             if cx < self.limites["xzmin"] or cx > self.limites["xzmax"]: return False

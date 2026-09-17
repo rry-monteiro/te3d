@@ -26,11 +26,8 @@ def spawn() -> None:
 
 
 # chamada quando a peça for travada
-def on_lock() -> None:
-    for ox, oy, oz in piece.mut_offsets:
-        position = piece.position
-        x, y, z = position.x + ox, position.y + oy, position.z + oz
-        ocupados.add((x, y, z))
+def on_lock()->None:
+    ocupados.update(piece._get_positions())
     spawn()
 
 
