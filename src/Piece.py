@@ -186,7 +186,7 @@ class Piece(ursina.Entity):
             # ta travada
             self.esta_travada = True
             # chama a função pra qunaod ela travar
-            self.on_lock()
+            ursina.invoke(self.on_lock, delay=0.01)
             return
         # invoca novamente
         ursina.invoke(self._queda_unitaria, delay=.5)
