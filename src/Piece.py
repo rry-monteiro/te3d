@@ -1,24 +1,25 @@
 import ursina
 from typing import Literal
 
+
 class Piece(ursina.Entity):
     def __init__(
-            self,
-            tipo: Literal["I", "O", "T", "S", "Z", "L", "J"],
-            xyz:int,
-            ocupados:set,
-            on_lock=None,
+        self,
+        tipo: Literal["I", "O", "T", "S", "Z", "L", "J"],
+        xyz: int,
+        ocupados: set,
+        on_lock=None,
     ):
         # <<<
         super().__init__()
         # limits da box
         self.limites = {
             # <<<
-            'ymin' : -xyz*2+1,    # valor mínimo que a peça pode cair
-            'xzmin' : -(xyz/2-1), # valor mínimo que a peça pode andar para z e x
-            'xzmax' : xyz/2       # valor máximo que a peça pode andar para z e x
+            "ymin": -xyz * 2 + 1,  # valor mínimo que a peça pode cair
+            "xzmin": -(xyz / 2 - 1),  # valor mínimo que a peça pode andar para z e x
+            "xzmax": xyz / 2,  # valor máximo que a peça pode andar para z e x
         }
-            # >>>
+        # >>>
         # mapa de tetraminos
         self.map_tetraminos = {
             # <<<
@@ -51,7 +52,7 @@ class Piece(ursina.Entity):
                 "color": ursina.color.blue,
             },
         }
-            # >>>
+        # >>>
         # tipo de peça definida por letra
         self.tipo = tipo
         # shader padrão
@@ -61,7 +62,7 @@ class Piece(ursina.Entity):
         # referencias dos cubos
         self.cubos = []
         # set de lugares ja ocupados
-        self.ocupados=ocupados
+        self.ocupados = ocupados
         # flag de peça travada
         self.esta_travada = False
         # função que é chamada quando a peça é ravada
@@ -101,19 +102,26 @@ class Piece(ursina.Entity):
         novos = []
         # salva quais serão os offsets novos depois das mudanças
         for x, y, z in self.mut_offsets:
-            if axis == "x":   novos.append((x, -z, y))
-            elif axis == "y": novos.append((z, y, -x))
-            elif axis == "z": novos.append((-y, x, z))
+            if axis == "x":
+                novos.append((x, -z, y))
+            elif axis == "y":
+                novos.append((z, y, -x))
+            elif axis == "z":
+                novos.append((-y, x, z))
 
         # verifica se os offsets novos saem da box
         for cx, cy, cz in self._get_positions(offsets=novos):
             # verifica se algum deles passa da box
-            if cx < self.limites["xzmin"] or cx > self.limites["xzmax"]: return
-            if cz < self.limites["xzmin"] or cz > self.limites["xzmax"]: return
-            if cy < self.limites["ymin"]: return
+            if cx < self.limites["xzmin"] or cx > self.limites["xzmax"]:
+                return
+            if cz < self.limites["xzmin"] or cz > self.limites["xzmax"]:
+                return
+            if cy < self.limites["ymin"]:
+                return
 
             # verificação de colisão com outras peças
-            if (cx, cy, cz) in self.ocupados: return
+            if (cx, cy, cz) in self.ocupados:
+                return
 
         # salva a nova posição
         self.mut_offsets = novos
@@ -123,63 +131,65 @@ class Piece(ursina.Entity):
         # >>>
 
     # retorna uma lista de tuplas com as posições das peças da peça (ta confuso, mas retorna a posição da peça)
-    def _get_positions(self, offsets=None, dx:float=0, dy:float=0, dz:float=0)->list(tuple):
+    def _get_positions(
+        self, offsets=None, dx: float = 0, dy: float = 0, dz: float = 0
+    ) -> list[tuple[float, float, float]]:
         return [
             # <<<
             (
                 self.position.x + ox + dx,
                 self.position.y + oy + dy,
-               self.position.z + oz + dz,
+                self.position.z + oz + dz,
             )
             for ox, oy, oz in (offsets if offsets else self.mut_offsets)
-
             # >>>
         ]
 
     # verifica se a peça pode se mover
-    def _can_move(self, dx=0, dy=0, dz=0)->bool:
+    def _can_move(self, dx=0, dy=0, dz=0) -> bool:
         # <<<
         # pega as posições
         for x, y, z in self._get_positions(dx=dx, dy=dy, dz=dz):
-            
             # verifica se ja ta ocupado
-            if (x, y, z) in self.ocupados: return False
+            if (x, y, z) in self.ocupados:
+                return False
             # verifica se sai da caixa
-            if x < self.limites["xzmin"] or x > self.limites["xzmax"]: return False
-            if z < self.limites["xzmin"] or z > self.limites["xzmax"]: return False
-            if y < self.limites["ymin"]: return False
+            if x < self.limites["xzmin"] or x > self.limites["xzmax"]:
+                return False
+            if z < self.limites["xzmin"] or z > self.limites["xzmax"]:
+                return False
+            if y < self.limites["ymin"]:
+                return False
 
         return True
         # >>>
 
     # tenta mover uma peça
-    def _move(self, dx:float, dy:float, dz:float)->bool:
+    def _move(self, dx: float, dy: float, dz: float) -> bool:
         # <<<
-        # verifica se pode mover
-        if self._can_move(dx, dy, dz):
-            # se sim, move e retorna True
-            self.position += (dx, dy, dz)
-            return True
-        else:
-            # senão, só retorna False
+        # verifica se não pode mover, se não puder, ja da return False
+        if not self._can_move(dx, dy, dz):
             return False
+        # move a peça e retorna True
+        self.position += (dx, dy, dz)
+        return True
         # >>>
 
     # começa a queda
-    def _init_queda(self)->None:
+    def _init_queda(self) -> None:
         # <<<
-        ursina.invoke(self._queda_unitaria, delay=.5)
+        ursina.invoke(self._queda_unitaria, delay=0.5)
         # >>>
 
     # faz a peça cair de 1 em 1
-    def _queda_unitaria(self):
+    def _queda_unitaria(self) -> None:
         # <<<
         # se ja está travada, retorna
         if self.esta_travada:
             return
 
         # tenta mover
-        move_ok = self._move(0,-1,0)
+        move_ok = self._move(0, -1, 0)
 
         # se não moveu
         if not move_ok:
@@ -189,11 +199,11 @@ class Piece(ursina.Entity):
             ursina.invoke(self.on_lock, delay=0.01)
             return
         # invoca novamente
-        ursina.invoke(self._queda_unitaria, delay=.5)
+        ursina.invoke(self._queda_unitaria, delay=0.5)
         # >>>
 
     # dropa a peça até o fim
-    def _drop(self):
+    def _drop(self) -> None:
         # <<<
         # inicia uma distância com 0
         distancia_y = 0
@@ -211,13 +221,22 @@ class Piece(ursina.Entity):
 
     # recebe chaves do teclado e realiza ações
     def input(self, key):
-        if self.esta_travada: return
+        if self.esta_travada:
+            return
         match key:
-            case "space": self._drop()
-            case "w": self._move(0, 0, 1)
-            case "s": self._move(0, 0, -1)
-            case "d": self._move(1, 0, 0)
-            case "a": self._move(-1, 0, 0)
-            case "h": self._rotate("y")
-            case "j": self._rotate("x")
-            case "k": self._rotate("z")
+            case "space":
+                self._drop()
+            case "w":
+                self._move(0, 0, 1)
+            case "s":
+                self._move(0, 0, -1)
+            case "d":
+                self._move(1, 0, 0)
+            case "a":
+                self._move(-1, 0, 0)
+            case "h":
+                self._rotate("y")
+            case "j":
+                self._rotate("x")
+            case "k":
+                self._rotate("z")
