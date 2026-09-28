@@ -136,27 +136,37 @@ class Piece(ursina.Entity):
             # >>>
         ]
 
-    # tenta mover uma peça
-    def _move(self, dx:float, dy:float, dz:float)->None:
+    # verifica se a peça pode se mover
+    def _can_move(self, dx=0, dy=0, dz=0)->bool:
         # <<<
-        #cria as posições virtuais
-        for cx, cy, cz in self._get_positions(dx=dx, dy=dy, dz=dz):
+        # pega as posições
+        for x, y, z in self._get_positions(dx=dx, dy=dy, dz=dz):
+            
+            # verifica se ja ta ocupado
+            if (x, y, z) in self.ocupados: return False
+            # verifica se sai da caixa
+            if x < self.limites["xzmin"] or x > self.limites["xzmax"]: return False
+            if z < self.limites["xzmin"] or z > self.limites["xzmax"]: return False
+            if y < self.limites["ymin"]: return False
 
-            # verifica se elas saem da box
-            if cx < self.limites["xzmin"] or cx > self.limites["xzmax"]: return False
-            if cz < self.limites["xzmin"] or cz > self.limites["xzmax"]: return False
-            if cy < self.limites["ymin"]: return False
-
-            # verificação de colisão com outras peças
-            if (cx, cy, cz) in self.ocupados: return False
-
-        # altera a posição
-        self.position += (dx, dy, dz)
         return True
         # >>>
 
+    # tenta mover uma peça
+    def _move(self, dx:float, dy:float, dz:float)->None:
+        # <<<
+        # verifica se pode mover
+        if self._can_move(dx, dy, dz):
+            # se sim, move e retorna True
+            self.position += (dx, dy, dz)
+            return True
+        else:
+            # senão, só retorna False
+            return False
+        # >>>
+
     # começa a queda
-    def _init_queda(self):
+    def _init_queda(self)->None:
         # <<<
         ursina.invoke(self._queda_unitaria, delay=.5)
         # >>>
@@ -165,7 +175,8 @@ class Piece(ursina.Entity):
     def _queda_unitaria(self):
         # <<<
         # se ja está travada, retorna
-        if self.esta_travada: return
+        if self.esta_travada:
+            return
 
         # tenta mover
         move_ok = self._move(0,-1,0)
