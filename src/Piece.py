@@ -129,7 +129,7 @@ class Piece(ursina.Entity):
             (
                 self.position.x + ox + dx,
                 self.position.y + oy + dy,
-                self.position.z + oz + dz,
+               self.position.z + oz + dz,
             )
             for ox, oy, oz in (offsets if offsets else self.mut_offsets)
 
@@ -153,7 +153,7 @@ class Piece(ursina.Entity):
         # >>>
 
     # tenta mover uma peça
-    def _move(self, dx:float, dy:float, dz:float)->None:
+    def _move(self, dx:float, dy:float, dz:float)->bool:
         # <<<
         # verifica se pode mover
         if self._can_move(dx, dy, dz):
@@ -194,13 +194,26 @@ class Piece(ursina.Entity):
 
     # dropa a peça até o fim
     def _drop(self):
-        pass
+        # <<<
+        # inicia uma distância com 0
+        distancia_y = 0
+        # loop que roda até _can_move retornar False
+        # isso incrementa 1 na distância permitida, que depois é usada no _move
+        while self._can_move(0, -(distancia_y + 1), 0):
+            distancia_y += 1
+
+        # movendo a peça pra ultima distância permitida
+        self._move(0, -distancia_y, 0)
+
+        self.esta_travada = True
+        ursina.invoke(self.on_lock, delay=0.01)
+        # >>>
 
     # recebe chaves do teclado e realiza ações
     def input(self, key):
         if self.esta_travada: return
         match key:
-            case "space": pass  # hard drop depois
+            case "space": self._drop()
             case "w": self._move(0, 0, 1)
             case "s": self._move(0, 0, -1)
             case "d": self._move(1, 0, 0)
