@@ -51,6 +51,8 @@ class Piece(ursina.Entity):
             },
         }
         # >>>
+        # parent do ghost
+        self.ghost = ursina.Entity()
         # tipo de peça definida por letra
         self.tipo = tipo
         # shader padrão
@@ -67,12 +69,14 @@ class Piece(ursina.Entity):
         self.on_lock = on_lock
         # valor do drop
         self.drop_value = 0
+        # referência dos cubos do ghost
+        self.ghost_cubos = []
         # construção
         self._build()
         # inicia a queda
         self._init_queda()
         # calcula o drop
-        self._update_drop_distance()
+        self._update_drop()
         # >>>
 
     # constroi a peça
@@ -89,6 +93,19 @@ class Piece(ursina.Entity):
                 parent=self,
             )
             self.cubos.append(cubo)
+
+            ghost = ursina.Entity(
+                model="cube",
+                name="tetris-g",
+                # texture="brick",
+                position=offset,
+                color=self.map_tetraminos[self.tipo]["color"],
+                # shader=self.shader,
+                parent=self.ghost,
+                alpha = 0.5,
+            )
+
+            self.ghost_cubos.append(ghost)
         # >>>
 
     # rotaciona a peça
@@ -119,9 +136,10 @@ class Piece(ursina.Entity):
         # muda os cubos de lugar de acordo com os novos
         for i in range(len(self.cubos)):
             self.cubos[i].position = self.mut_offsets[i]
+            self.ghost_cubos[i].position = self.mut_offsets[i]
 
         # atualiza o drop
-        self._update_drop_distance()
+        self._update_drop()
         # >>>
 
     # retorna uma lista de tuplas com as posições das peças da peça (ta confuso, mas retorna a posição da peça)
@@ -168,14 +186,18 @@ class Piece(ursina.Entity):
         self.position += (dx, dy, dz)
 
         #atualiza o drop
-        self._update_drop_distance()
+        self._update_drop()
         return True
         # >>>
 
     def _lock(self):
         # <<<
+        if self.esta_travada:
+            return
         # ta travada
         self.esta_travada = True
+        # desativa o ghost
+        self.ghost.enabled = False
         # chama a função pra qunaod ela travar
         ursina.invoke(self.on_lock, delay=0.01)
         # >>>
@@ -204,11 +226,11 @@ class Piece(ursina.Entity):
         ursina.invoke(self._queda_unitaria, delay=0.5)
 
         #atualiza o drop
-        self._update_drop_distance()
+        self._update_drop()
         # >>>
 
     # dá a distância do drop
-    def _update_drop_distance(self)->None:
+    def _update_drop(self)->None:
         # <<<
         # inicia uma distância com 0
         distancia_y = 0
@@ -217,6 +239,13 @@ class Piece(ursina.Entity):
         while self._can_move(dx=0, dy=-(distancia_y + 1), dz=0):
             distancia_y += 1
         self.drop_value = -distancia_y
+
+        # atualiza a posição do ghost
+        self.ghost.position = (
+            self.position.x,
+            self.position.y + self.drop_value,
+            self.position.z,
+        )
         # >>>
 
     # dropa a peça até o fim
