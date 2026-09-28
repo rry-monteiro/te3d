@@ -110,19 +110,8 @@ class Piece(ursina.Entity):
                 novos.append((-y, x, z))
 
         # verifica se os offsets novos saem da box
-        for cx, cy, cz in self._get_positions(offsets=novos):
-            # verifica se algum deles passa da box
-            if cx < self.limites["xzmin"] or cx > self.limites["xzmax"]:
-                return
-            if cz < self.limites["xzmin"] or cz > self.limites["xzmax"]:
-                return
-            if cy < self.limites["ymin"]:
-                return
-
-            # verificação de colisão com outras peças
-            if (cx, cy, cz) in self.ocupados:
-                return
-
+        if not self._can_move(offsets=novos):
+            return
         # salva a nova posição
         self.mut_offsets = novos
         # muda os cubos de lugar de acordo com os novos
@@ -146,10 +135,10 @@ class Piece(ursina.Entity):
         ]
 
     # verifica se a peça pode se mover
-    def _can_move(self, dx=0, dy=0, dz=0) -> bool:
+    def _can_move(self, offsets=None, dx=0, dy=0, dz=0) -> bool:
         # <<<
         # pega as posições
-        for x, y, z in self._get_positions(dx=dx, dy=dy, dz=dz):
+        for x, y, z in self._get_positions(offsets=offsets, dx=dx, dy=dy, dz=dz):
             # verifica se ja ta ocupado
             if (x, y, z) in self.ocupados:
                 return False
@@ -168,7 +157,7 @@ class Piece(ursina.Entity):
     def _move(self, dx: float, dy: float, dz: float) -> bool:
         # <<<
         # verifica se não pode mover, se não puder, ja da return False
-        if not self._can_move(dx, dy, dz):
+        if not self._can_move(dx=dx, dy=dy, dz=dz):
             return False
         # move a peça e retorna True
         self.position += (dx, dy, dz)
@@ -209,7 +198,7 @@ class Piece(ursina.Entity):
         distancia_y = 0
         # loop que roda até _can_move retornar False
         # isso incrementa 1 na distância permitida, que depois é usada no _move
-        while self._can_move(0, -(distancia_y + 1), 0):
+        while self._can_move(dx=0, dy=-(distancia_y + 1), dz=0):
             distancia_y += 1
 
         # movendo a peça pra ultima distância permitida
@@ -234,9 +223,9 @@ class Piece(ursina.Entity):
                 self._move(1, 0, 0)
             case "a":
                 self._move(-1, 0, 0)
-            case "h":
+            case "1":
                 self._rotate("y")
-            case "j":
+            case "2":
                 self._rotate("x")
-            case "k":
+            case "3":
                 self._rotate("z")

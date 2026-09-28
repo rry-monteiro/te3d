@@ -4,7 +4,7 @@ from ursina import Ursina
 from ursina import EditorCamera
 import random
 
-XYZ: int = 12
+XYZ: int = 10
 TIPOS: list = ["I", "O", "T", "S", "Z", "L", "J"]
 piece = None
 ocupados: set = set()
@@ -26,7 +26,7 @@ def spawn() -> None:
 
 
 # chamada quando a peça for travada
-def on_lock()->None:
+def on_lock() -> None:
     ocupados.update(piece._get_positions())
     spawn()
 
