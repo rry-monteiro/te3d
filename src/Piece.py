@@ -65,10 +65,14 @@ class Piece(ursina.Entity):
         self.esta_travada = False
         # função que é chamada quando a peça é ravada
         self.on_lock = on_lock
+        # valor do drop
+        self.drop_value = 0
         # construção
         self._build()
         # inicia a queda
         self._init_queda()
+        # calcula o drop
+        self._update_drop_distance()
         # >>>
 
     # constroi a peça
@@ -115,6 +119,9 @@ class Piece(ursina.Entity):
         # muda os cubos de lugar de acordo com os novos
         for i in range(len(self.cubos)):
             self.cubos[i].position = self.mut_offsets[i]
+
+        # atualiza o drop
+        self._update_drop_distance()
         # >>>
 
     # retorna uma lista de tuplas com as posições das peças da peça (ta confuso, mas retorna a posição da peça)
@@ -159,7 +166,18 @@ class Piece(ursina.Entity):
             return False
         # move a peça e retorna True
         self.position += (dx, dy, dz)
+
+        #atualiza o drop
+        self._update_drop_distance()
         return True
+        # >>>
+
+    def _lock(self):
+        # <<<
+        # ta travada
+        self.esta_travada = True
+        # chama a função pra qunaod ela travar
+        ursina.invoke(self.on_lock, delay=0.01)
         # >>>
 
     # começa a queda
@@ -180,34 +198,33 @@ class Piece(ursina.Entity):
 
         # se não moveu
         if not move_ok:
-            # ta travada
-            self.esta_travada = True
-            # chama a função pra qunaod ela travar
-            ursina.invoke(self.on_lock, delay=0.01)
+            self._lock()
             return
         # invoca novamente
         ursina.invoke(self._queda_unitaria, delay=0.5)
+
+        #atualiza o drop
+        self._update_drop_distance()
         # >>>
 
     # dá a distância do drop
-    def _get_drop_distance(self)->int:
+    def _update_drop_distance(self)->None:
+        # <<<
         # inicia uma distância com 0
         distancia_y = 0
         # loop que roda até _can_move retornar False
         # isso incrementa 1 na distância permitida, que depois é usada no _move
         while self._can_move(dx=0, dy=-(distancia_y + 1), dz=0):
             distancia_y += 1
+        self.drop_value = -distancia_y
+        # >>>
 
-        return -distancia_y
     # dropa a peça até o fim
     def _drop(self) -> None:
         # <<<
-        distancia_y = self._get_drop_distance()
         # movendo a peça pra ultima distância permitida
-        self._move(0, distancia_y, 0)
-
-        self.esta_travada = True
-        ursina.invoke(self.on_lock, delay=0.01)
+        self._move(0, self.drop_value, 0)
+        self._lock()
         # >>>
 
     # recebe chaves do teclado e realiza ações
