@@ -14,12 +14,10 @@ class Piece(ursina.Entity):
         super().__init__()
         # limits da box
         self.limites = {
-            # <<<
             "ymin": -xyz * 2 + 1,  # valor mínimo que a peça pode cair
             "xzmin": -(xyz / 2 - 1),  # valor mínimo que a peça pode andar para z e x
             "xzmax": xyz / 2,  # valor máximo que a peça pode andar para z e x
         }
-        # >>>
         # mapa de tetraminos
         self.map_tetraminos = {
             # <<<
@@ -191,9 +189,8 @@ class Piece(ursina.Entity):
         ursina.invoke(self._queda_unitaria, delay=0.5)
         # >>>
 
-    # dropa a peça até o fim
-    def _drop(self) -> None:
-        # <<<
+    # dá a distância do drop
+    def _get_drop_distance(self)->int:
         # inicia uma distância com 0
         distancia_y = 0
         # loop que roda até _can_move retornar False
@@ -201,8 +198,13 @@ class Piece(ursina.Entity):
         while self._can_move(dx=0, dy=-(distancia_y + 1), dz=0):
             distancia_y += 1
 
+        return -distancia_y
+    # dropa a peça até o fim
+    def _drop(self) -> None:
+        # <<<
+        distancia_y = self._get_drop_distance()
         # movendo a peça pra ultima distância permitida
-        self._move(0, -distancia_y, 0)
+        self._move(0, distancia_y, 0)
 
         self.esta_travada = True
         ursina.invoke(self.on_lock, delay=0.01)
