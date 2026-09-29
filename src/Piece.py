@@ -196,8 +196,8 @@ class Piece(ursina.Entity):
             return
         # ta travada
         self.esta_travada = True
-        # desativa o ghost
-        self.ghost.enabled = False
+        # destroi o ghost
+        ursina.destroy(self.ghost)
         # chama a função pra qunaod ela travar
         ursina.invoke(self.on_lock, delay=0.01)
         # >>>
