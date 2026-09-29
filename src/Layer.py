@@ -9,3 +9,6 @@ class Layer(ursina.Entity):
         # quantos blocos a camada aguenta
         self.capacidade = xyz**2
         self.y_position = y
+
+    def is_full(self):
+        return len(self.children) == self.capacidade
