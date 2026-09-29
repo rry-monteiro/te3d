@@ -102,7 +102,7 @@ class Piece(ursina.Entity):
                 color=self.map_tetraminos[self.tipo]["color"],
                 # shader=self.shader,
                 parent=self.ghost,
-                alpha = 0.5,
+                alpha=0.5,
             )
 
             self.ghost_cubos.append(ghost)
@@ -185,7 +185,7 @@ class Piece(ursina.Entity):
         # move a peça e retorna True
         self.position += (dx, dy, dz)
 
-        #atualiza o drop
+        # atualiza o drop
         self._update_drop()
         return True
         # >>>
@@ -225,12 +225,12 @@ class Piece(ursina.Entity):
         # invoca novamente
         ursina.invoke(self._queda_unitaria, delay=0.5)
 
-        #atualiza o drop
+        # atualiza o drop
         self._update_drop()
         # >>>
 
     # dá a distância do drop
-    def _update_drop(self)->None:
+    def _update_drop(self) -> None:
         # <<<
         # inicia uma distância com 0
         distancia_y = 0
