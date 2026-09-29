@@ -1,13 +1,16 @@
 from Piece import Piece
 from Box import Box
+from Layer import Layer
 from ursina import Ursina
 from ursina import EditorCamera
 import random
 
 XYZ: int = 10
-TIPOS: list = ["I", "O", "T", "S", "Z", "L", "J"]
+# TIPOS: list = ["I", "O", "T", "S", "Z", "L", "J"]
+TIPOS: list = ["O"]
 piece = None
 ocupados: set = set()
+_camadas = {y: Layer(y=y, xyz=XYZ) for y in range(-XYZ * 2 + 1, 1)}
 
 
 def main() -> None:
@@ -27,7 +30,21 @@ def spawn() -> None:
 
 # chamada quando a peça for travada
 def on_lock() -> None:
-    ocupados.update(piece._get_positions())
+    posicoes = piece._get_positions()
+
+    ocupados.update(posicoes)
+
+    # coloca cada cubo na sua camada de acordo com y
+    for cubo, (_, y, _) in zip(piece.cubos, posicoes):
+        cubo.world_parent = _camadas[y]
+
+    # filtra quais camadas foram alteradas
+    ys_ocupados = {y for _, y, _ in posicoes}
+
+    # verifica cada camada modificada e diz se ta cheia
+    for y in ys_ocupados:
+        if _camadas[y].is_full():
+            print("CAMADA COMPLETA:", y)
     spawn()
 
 
