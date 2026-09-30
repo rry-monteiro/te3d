@@ -1,8 +1,9 @@
-import ursina
 from typing import Literal
 
+import ursina
 
-class Piece(ursina.Entity):
+
+class Piece(ursina.entity.Entity):
     def __init__(
         self,
         tipo: Literal["I", "O", "T", "S", "Z", "L", "J"],
@@ -143,7 +144,7 @@ class Piece(ursina.Entity):
         # >>>
 
     # retorna uma lista de tuplas com as posições das peças da peça (ta confuso, mas retorna a posição da peça)
-    def _get_positions(
+    def get_positions(
         self, offsets=None, dx: float = 0, dy: float = 0, dz: float = 0
     ) -> list[tuple[float, float, float]]:
         return [
@@ -161,7 +162,7 @@ class Piece(ursina.Entity):
     def _can_move(self, offsets=None, dx=0, dy=0, dz=0) -> bool:
         # <<<
         # pega as posições
-        for x, y, z in self._get_positions(offsets=offsets, dx=dx, dy=dy, dz=dz):
+        for x, y, z in self.get_positions(offsets=offsets, dx=dx, dy=dy, dz=dz):
             # verifica se ja ta ocupado
             if (x, y, z) in self.ocupados:
                 return False

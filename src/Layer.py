@@ -1,7 +1,7 @@
 import ursina
 
 
-class Layer(ursina.Entity):
+class Layer(ursina.entity.Entity):
     def __init__(self, xyz: int, y: int):
         # inicia a camada no y desejado
         # como serão criadas várias camadas de uma vez, passamos só a var y
@@ -10,5 +10,11 @@ class Layer(ursina.Entity):
         self.capacidade = xyz**2
         self.y_position = y
 
+    # responde se a camada ta lotada
     def is_full(self):
         return len(self.children) == self.capacidade
+
+    # apaga todos os cubos
+    def clear(self):
+        for cubo in list(self.children):
+            ursina.destroy(cubo)

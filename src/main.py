@@ -1,11 +1,12 @@
-from Piece import Piece
-from Box import Box
-from Layer import Layer
-from ursina import Ursina
-from ursina import EditorCamera
 import random
 
-XYZ: int = 10
+from ursina import EditorCamera, Ursina
+
+from Box import Box
+from Layer import Layer
+from Piece import Piece
+
+XYZ: int = 8
 # TIPOS: list = ["I", "O", "T", "S", "Z", "L", "J"]
 TIPOS: list = ["O"]
 piece = None
@@ -24,13 +25,15 @@ def main() -> None:
 # invoca a peça
 def spawn() -> None:
     global piece  # usa a peça de fora, sem criar
-    tipo: int = random.choice(TIPOS)  # esoclhe o tipo aleatorio
+    tipo = random.choice(TIPOS)  # esoclhe o tipo aleatorio
     piece = Piece(tipo=tipo, xyz=XYZ, ocupados=ocupados, on_lock=on_lock)
 
 
 # chamada quando a peça for travada
 def on_lock() -> None:
-    posicoes = piece._get_positions()
+    assert piece is not None
+
+    posicoes = piece.get_positions()
 
     ocupados.update(posicoes)
 
@@ -45,6 +48,10 @@ def on_lock() -> None:
     for y in ys_ocupados:
         if _camadas[y].is_full():
             print("CAMADA COMPLETA:", y)
+            _camadas[y].clear()
+            ocupados.difference_update({pos for pos in ocupados if pos[1] == y})
+
+    # chama a proxima peça (loop)
     spawn()
 
 
