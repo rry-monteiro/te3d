@@ -1,6 +1,6 @@
 import random
 
-from ursina import EditorCamera, Ursina
+from ursina import EditorCamera, Ursina, destroy
 
 from Box import Box
 from Layer import Layer
@@ -54,6 +54,9 @@ def organize():
     for y in ys_cheias:
         camadas[y].clear()
 
+    # remove os ocupados
+    ocupados.difference_update({pos for pos in ocupados if pos[1] in ys_cheias})
+
     camadas_num = -XYZ * 2 + 1
     # itera em todas as camadas pra descer quem precisa
     for y in sorted(camadas):
@@ -84,6 +87,10 @@ def organize():
 def on_lock() -> None:
     # chama a organização dos ocupados
     organize()
+
+    #detroy a entity da peça
+    destroy(piece)
+
     # chama a proxima peça (loop)
     spawn()
 
