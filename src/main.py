@@ -1,4 +1,5 @@
 import random
+import sys
 
 from ursina import EditorCamera, Ursina, destroy
 
@@ -34,6 +35,10 @@ def organize():
     assert piece is not None
     posicoes = piece.get_positions()  # pega as posções da peça atual
     ocupados.update(posicoes)  # coloca elas no set
+
+    for p in posicoes:
+        if p[1] == -1:
+            game_over()
 
     # coloca cada cubo na sua camada de acordo com y
     for cubo, (_, y, _) in zip(piece.cubos, posicoes):
@@ -83,12 +88,17 @@ def organize():
     # >>>
 
 
+# fecha tudo e finaliza o jogo
+def game_over() -> None:
+    sys.exit()
+
+
 # chamada quando a peça for travada
 def on_lock() -> None:
     # chama a organização dos ocupados
     organize()
 
-    #detroy a entity da peça
+    # detroy a entity da peça
     destroy(piece)
 
     # chama a proxima peça (loop)
