@@ -154,7 +154,7 @@ class Piece(ursina.entity.Entity):
                 self.position.y + oy + dy,
                 self.position.z + oz + dz,
             )
-            for ox, oy, oz in (offsets if offsets else self.mut_offsets)
+            for ox, oy, oz in (self.mut_offsets if offsets is None else offsets)
             # >>>
         ]
 
@@ -225,9 +225,6 @@ class Piece(ursina.entity.Entity):
             return
         # invoca novamente
         ursina.invoke(self._queda_unitaria, delay=0.5)
-
-        # atualiza o drop
-        self._update_drop()
         # >>>
 
     # dá a distância do drop
